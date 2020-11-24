@@ -45,7 +45,8 @@ const App = (state) => {
 
 // listening for load event because page should load before any JS is called
 window.addEventListener('load', () => {
-    render(root, store)
+    render(root, store);
+    setInterval(_=>render(root, store),1000);
 })
 
 // ------------------------------------------------------  COMPONENTS
