@@ -50,9 +50,13 @@ const draw = (() => {
 
         // draw roverList
         document.getElementById('roverList').innerHTML = ["", ...marsDashboard.rover].reduce((html, roverObj, index) => html += `
-                        <a class="nav-link ${roverObj.isActive ? "active" : ""}"
-                            onclick="setRover(${index - 1})"
-                            href="#">${roverObj.name}</a>
+                        <li class="nav-item ">
+                            <a class="nav-link text-light pb-1 ${roverObj.isActive ? "border-bottom border-light" : ""}" 
+                               onclick="setRover(${index - 1})"
+                               href="javascript:void(0)">
+                                ${roverObj.name}
+                            </a>
+                        </li>
         `);
 
         // draw roverContain
@@ -60,7 +64,7 @@ const draw = (() => {
         if (currentRover) {
             document.getElementById('roverContain').innerHTML = ["", ...currentRover.camera].reduce((html, cameraObj, index) => html += `
                     <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card mb-4 mb-sm-5 shadow-sm">
+                        <div class="card bg-secondary text-light mb-4 mb-sm-5 shadow-sm">
                             <div id="${currentRover.name + "." + cameraObj.name}"
                                  class="carousel slide card-img-top"
                                  data-ride="carousel">
@@ -72,8 +76,9 @@ const draw = (() => {
                                             alt="..."
                                             style="height: 225px;">
                                         <a href="${photo}"
-                                        target="_blank"
-                                        style="position: absolute; right:5px; bottom:5px;z-index:2;">
+                                            target="_blank"
+                                            class="text-white"
+                                            style="position: absolute; right:5px; bottom:5px;z-index:2;">
                                             <svg width="1em"
                                                 height="1em"
                                                 viewBox="0 0 16 16"
@@ -90,7 +95,6 @@ const draw = (() => {
                                 `)}
                                 </div>
                                 <a class="carousel-control-prev"
-                                   href="#${currentRover.name + "." + cameraObj.name}"
                                    role="button"
                                    data-slide="prev">
                                     <span class="carousel-control-prev-icon"
@@ -98,7 +102,6 @@ const draw = (() => {
                                     <span class="sr-only">Previous</span>
                                 </a>
                                 <a class="carousel-control-next"
-                                   href="#${currentRover.name + "." + cameraObj.name}"
                                    role="button"
                                    data-slide="next">
                                     <span class="carousel-control-next-icon"

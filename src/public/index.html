@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      class="h-100">
 
 <head>
     <meta charset="UTF-8">
@@ -14,6 +15,9 @@
           integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
           crossorigin="anonymous">
 
+    <link href="/assets/stylesheets/styles.css"
+          rel="stylesheet" />
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/3.8.2/immutable.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
             integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -25,27 +29,42 @@
             integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"
             crossorigin="anonymous"></script>
 
-    <link href="/assets/stylesheets/cover.css"
-          rel="stylesheet" />
-
 
 </head>
 
-<body class="text-center">
+<body class="text-center d-flex h-100 bg-dark">
     <div class="container d-flex w-100 h-100 p-3 mx-auto flex-column">
-        <header class="masthead mb-auto">
-            <div class="inner">
-                <h3 class="masthead-brand">Mars Dashboard</h3>
-                <nav id="roverList"
-                     class="nav nav-masthead justify-content-center">
-                    <!-- <a class="nav-link active"
-                       href="#">Curiosity</a>
-                    <a class="nav-link"
-                       href="#">Opportunity</a>
-                    <a class="nav-link"
-                       href="#">Spirit</a> -->
-                </nav>
+        <header class="">
+            <div class="clearfix">
+                <h3 class="float-md-left text-white">Mars Dashboard</h3>
+                <ul id="roverList"
+                    class="nav float-md-right justify-content-center">
+                    <!-- <li class="nav-item ">
+                        <a class="nav-link pb-1 text-dark border-bottom border-dark"
+                           href="#">Curiosity</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pb-1 text-dark"
+                           href="#">Opportunity</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pb-1 text-dark"
+                           href="#">Spirit</a>
+                    </li> -->
+                </ul>
             </div>
+            <section class="jumbotron py-4">
+                <h4 class="text-center">Curiosity</h4>
+                <p class="text-muted">Curiosity is a car-sized Mars rover designed to explore the Gale crater on Mars as
+                    part of NASA's Mars Science Laboratory (MSL) mission. Curiosity was launched from Cape Canaveral on
+                    November 26, 2011, at 15:02 UTC and landed on Aeolis Palus inside Gale on Mars on August 6, 2012,
+                    05:17 UTC. The Bradbury Landing site was less than 2.4 km (1.5 mi) from the center of the rover's
+                    touchdown target after a 560 million km (350 million mi) journey. The rover's goals include an
+                    investigation of the Martian climate and geology, assessment of whether the selected field site
+                    inside Gale has ever offered environmental conditions favorable for microbial life (including
+                    investigation of the role of water), and planetary habitability studies in preparation for human
+                    exploration.</p>
+            </section>
         </header>
 
         <main id="roverContain"
@@ -125,11 +144,13 @@
             -->
         </main>
 
-        <footer class="mastfoot mt-auto">
-            <div class="inner">
-                <p>Power by <a href="https://api.nasa.gov/"
-                       target="_blank">NASA</a>.</p>
-            </div>
+        <footer class="mt-auto text-white">
+            <p>Power by
+                <a class="text-white"
+                   href="https://api.nasa.gov/"
+                   target="_blank">NASA
+                </a>.
+            </p>
         </footer>
     </div>
 </body>
