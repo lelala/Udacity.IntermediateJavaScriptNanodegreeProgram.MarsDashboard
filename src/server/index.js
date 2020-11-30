@@ -15,7 +15,7 @@ app.use('/', express.static(path.join(__dirname, '../public')))
 // your API calls
 app.get('/api/mars_dashboard', async (req, res) => {
     console.log(`${new Date()} /api/mars_dashboard`);
-    const wikiResouce = [
+    const roverResouce = [
         {
             name: "Curiosity"
             , wikiUrl: "https://en.wikipedia.org/wiki/Curiosity_(rover)"
@@ -32,68 +32,77 @@ app.get('/api/mars_dashboard', async (req, res) => {
             , description: `Spirit, also known as MER-A (Mars Exploration Rover – A) or MER-2, is a robotic rover on Mars, active from 2004 to 2010. It was one of two rovers of NASA's Mars Exploration Rover Mission. It landed successfully within the impact crater Gusev on Mars at 04:35 Ground UTC on January 4, 2004, three weeks before its twin, Opportunity (MER-B), which landed on the other side of the planet. Its name was chosen through a NASA-sponsored student essay competition. The rover became stuck in a "sand trap" in late 2009 at an angle that hampered recharging of its batteries; its last communication with Earth was sent on March 22, 2010.`
         }
     ];
+    const roverList = roverResouce.map(roverObj => roverObj.name);
 
-    try {
-        let marsDashboard = { rover: [] };
-        for (const roverName of ["Curiosity", "Opportunity", "Spirit"]) {
-            const manifestRsp = await fetch(`https://api.nasa.gov/mars-photos/api/v1/manifests/${roverName}?api_key=${process.env.API_KEY}`).then(res => res.json());
-            console.log(`${new Date()} service responsed: https://api.nasa.gov/mars-photos/api/v1/manifests/${roverName}`);
-            let roverObj = Object.assign(
+    let marsDashboard = { rover: [] };
+    Promise.all(roverList.map(roverName => fetch(`https://api.nasa.gov/mars-photos/api/v1/manifests/${roverName}?api_key=${process.env.API_KEY}`).then(rsp => rsp.json())))
+        .then(manifestRsps => {
+            console.log(`${new Date()} all manifest responsed.`);
+            Promise.all(manifestRsps.map((manifestRsp, index) => {
+                //append to marsDashboard.rover
                 {
-                    name: ""
-                    , wikiUrl: ""
-                    , description: ""
-                    , launch_date: ""
-                    , landing_date: ""
-                    , status: ""
-                    , max_sol: 0
-                    , max_date: ""
-                    , camera: []
+                    let roverObj = Object.assign(
+                        {
+                            name: ""
+                            , wikiUrl: ""
+                            , description: ""
+                            , launch_date: ""
+                            , landing_date: ""
+                            , status: ""
+                            , max_sol: 0
+                            , max_date: ""
+                            , camera: []
+                        }
+                        , roverResouce.find(obj => obj.name == roverList[index])
+                        , {
+                            launch_date: manifestRsp.photo_manifest.launch_date
+                            , landing_date: manifestRsp.photo_manifest.landing_date
+                            , status: manifestRsp.photo_manifest.status
+                            , max_sol: manifestRsp.photo_manifest.max_sol
+                            , max_date: manifestRsp.photo_manifest.max_date
+                        }
+                    );
+                    marsDashboard.rover.push(roverObj);
                 }
-                , wikiResouce.find(obj => obj.name == roverName)
-                , {
-                    launch_date: manifestRsp.photo_manifest.launch_date
-                    , landing_date: manifestRsp.photo_manifest.landing_date
-                    , status: manifestRsp.photo_manifest.status
-                    , max_sol: manifestRsp.photo_manifest.max_sol
-                    , max_date: manifestRsp.photo_manifest.max_date
-                }
-            );
-            const photoRsp = await fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/${roverName}/photos?sol=${manifestRsp.photo_manifest.max_sol}&api_key=${process.env.API_KEY}`).then(res => res.json());
-            console.log(`${new Date()} service responsed: https://api.nasa.gov/mars-photos/api/v1/rovers/${roverName}/photos?sol=${manifestRsp.photo_manifest.max_sol}`);
-            roverObj.camera = [[], ...photoRsp.photos].reduce((list, photoObj) => {
-                let cameraObj = list.find(cam => cam.name == photoObj.camera.name);
-                if (!cameraObj) {
-                    cameraObj = {
-                        name: photoObj.camera.name
-                        , full_name: photoObj.camera.full_name
-                        , photo: []
-                    };
-                    list.push(cameraObj);
-                }
-                cameraObj.photo.push(photoObj.img_src);
-                return list;
-            }).sort((obj1, obj2) => {
-                const nameSort = [
-                    "FHAZ"
-                    , "RHAZ"
-                    , "MAST"
-                    , "CHEMCAM"
-                    , "MAHLI"
-                    , "MARDI"
-                    , "NAVCAM"
-                    , "PANCAM"
-                    , "MINITES"
-                ];
-                return nameSort.indexOf(obj1) == nameSort.indexOf(obj2) ? 0 : nameSort.indexOf(obj1) - nameSort.indexOf(obj2);
-            });
-            marsDashboard.rover.push(roverObj);
-        };
-        console.log(`${new Date()} result`);
-        res.send(marsDashboard);
-    } catch (err) {
-        console.log('error:', err);
-    }
+                // get last photo.
+                return fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/${roverList[index]}/photos?sol=${manifestRsp.photo_manifest.max_sol}&api_key=${process.env.API_KEY}`).then(rsp => rsp.json());
+            }))
+                .then(photoRsps => {
+                    console.log(`${new Date()} all photo responsed.`);
+                    photoRsps.forEach((photoRsp, index) => {
+                        marsDashboard.rover[index].camera = [[], ...photoRsp.photos].reduce((list, photoObj) => {
+                            let cameraObj = list.find(cam => cam.name == photoObj.camera.name);
+                            if (!cameraObj) {
+                                cameraObj = {
+                                    name: photoObj.camera.name
+                                    , full_name: photoObj.camera.full_name
+                                    , photo: []
+                                };
+                                list.push(cameraObj);
+                            }
+                            cameraObj.photo.push(photoObj.img_src);
+                            return list;
+                        }).sort((obj1, obj2) => {
+                            const nameSort = [
+                                "FHAZ"
+                                , "RHAZ"
+                                , "MAST"
+                                , "CHEMCAM"
+                                , "MAHLI"
+                                , "MARDI"
+                                , "NAVCAM"
+                                , "PANCAM"
+                                , "MINITES"
+                            ];
+                            return nameSort.indexOf(obj1) == nameSort.indexOf(obj2) ? 0 : nameSort.indexOf(obj1) - nameSort.indexOf(obj2);
+                        });
+                    });
+                    // response
+                    res.send(marsDashboard);
+                })
+                .catch(error => console.log(`${new Date()} get photo error: ${error}`));
+        })
+        .catch(error => console.log(`${new Date()} get manifest error: ${error}`));
 });
 
 
