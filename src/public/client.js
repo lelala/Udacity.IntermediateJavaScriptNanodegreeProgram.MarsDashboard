@@ -45,15 +45,16 @@ let marsDashboard = {
 
 // draw/redraw whole html body
 const draw = (() => {
+    // make a privte variable to store last input obj, use to check if data really changed when redraw.
     let checkData;
     return (newData) => {
-        // check if data really changed
+        // use Immutable to check if data really changed
         {
             if (Immutable.Map({}).mergeDeep(newData).equals(checkData))
                 return;
             checkData = Immutable.Map({}).mergeDeep(newData);
         }
-        // draw 
+        // draw/redraw it
         {
             const currentRover = newData.rover.find(roverObj => roverObj.isActive) || {};
             document.querySelector("body").innerHTML = `
