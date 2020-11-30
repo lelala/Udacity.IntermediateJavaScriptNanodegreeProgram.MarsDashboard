@@ -35,7 +35,7 @@ app.get('/api/mars_dashboard', async (req, res) => {
     const roverList = roverResouce.map(roverObj => roverObj.name);
 
     let marsDashboard = { rover: [] };
-    Promise.all(roverList.map(roverName => fetch(`https://api.nasa.gov/mars-photos/api/v1/manifests/${roverName}?api_key=${process.env.API_KEY}`).then(rsp => rsp.json())))
+    Promise.all(roverList.map(roverName => fetch(`https://api.nasa.gov/mars-photos/api/v1/manifests/${roverName}?api_key=${process.env.API_KEY || "DEMO_KEY"}`).then(rsp => rsp.json())))
         .then(manifestRsps => {
             console.log(`${new Date()} all manifest responsed.`);
             Promise.all(manifestRsps.map((manifestRsp, index) => {
@@ -65,7 +65,7 @@ app.get('/api/mars_dashboard', async (req, res) => {
                     marsDashboard.rover.push(roverObj);
                 }
                 // get last photo.
-                return fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/${roverList[index]}/photos?sol=${manifestRsp.photo_manifest.max_sol}&api_key=${process.env.API_KEY}`).then(rsp => rsp.json());
+                return fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/${roverList[index]}/photos?sol=${manifestRsp.photo_manifest.max_sol}&api_key=${process.env.API_KEY || "DEMO_KEY"}`).then(rsp => rsp.json());
             }))
                 .then(photoRsps => {
                     console.log(`${new Date()} all photo responsed.`);
@@ -109,7 +109,7 @@ app.get('/api/mars_dashboard', async (req, res) => {
 // example API call
 // app.get('/apod', async (req, res) => {
 //     try {
-//         let image = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`)
+//         let image = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY || "DEMO_KEY"}`)
 //             .then(res => res.json())
 //         res.send({ image })
 //     } catch (err) {
