@@ -14,6 +14,7 @@ app.use('/', express.static(path.join(__dirname, '../public')))
 
 // your API calls
 app.get('/api/mars_dashboard', async (req, res) => {
+    console.log(`${new Date()} /api/mars_dashboard`);
     const wikiResouce = [
         {
             name: "Curiosity"
@@ -36,6 +37,7 @@ app.get('/api/mars_dashboard', async (req, res) => {
         let marsDashboard = { rover: [] };
         for (const roverName of ["Curiosity", "Opportunity", "Spirit"]) {
             const manifestRsp = await fetch(`https://api.nasa.gov/mars-photos/api/v1/manifests/${roverName}?api_key=${process.env.API_KEY}`).then(res => res.json());
+            console.log(`${new Date()} service responsed: https://api.nasa.gov/mars-photos/api/v1/manifests/${roverName}`);
             let roverObj = Object.assign(
                 {
                     name: ""
@@ -58,6 +60,7 @@ app.get('/api/mars_dashboard', async (req, res) => {
                 }
             );
             const photoRsp = await fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/${roverName}/photos?sol=${manifestRsp.photo_manifest.max_sol}&api_key=${process.env.API_KEY}`).then(res => res.json());
+            console.log(`${new Date()} service responsed: https://api.nasa.gov/mars-photos/api/v1/rovers/${roverName}/photos?sol=${manifestRsp.photo_manifest.max_sol}`);
             roverObj.camera = [[], ...photoRsp.photos].reduce((list, photoObj) => {
                 let cameraObj = list.find(cam => cam.name == photoObj.camera.name);
                 if (!cameraObj) {
@@ -86,7 +89,7 @@ app.get('/api/mars_dashboard', async (req, res) => {
             });
             marsDashboard.rover.push(roverObj);
         };
-
+        console.log(`${new Date()} result`);
         res.send(marsDashboard);
     } catch (err) {
         console.log('error:', err);
